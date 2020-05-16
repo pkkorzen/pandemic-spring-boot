@@ -62,6 +62,7 @@ public enum CityCards implements Card {
         return this.name();
     }
 
+    @Override
     public Color getColor(){
         return color;
     }

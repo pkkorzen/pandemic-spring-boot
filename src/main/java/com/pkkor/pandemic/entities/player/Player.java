@@ -9,6 +9,9 @@ public class Player {
     private String city;
     private int actionsNumber;
     private Card[] cards;
+    private String name;
+
+    public Player() {}
 
     public Player(Characters character) {
         this.character = character;
@@ -56,4 +59,13 @@ public class Player {
     public void setCards(Card[] cards) {
         this.cards = cards;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

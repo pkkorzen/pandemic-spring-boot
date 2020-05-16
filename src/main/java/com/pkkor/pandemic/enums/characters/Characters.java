@@ -50,4 +50,8 @@ public enum Characters {
     public Buildable getBuildingAction() {
         return buildingAction;
     }
+
+    public String getName () {
+        return this.name();
+    }
 }

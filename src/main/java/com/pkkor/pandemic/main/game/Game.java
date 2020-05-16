@@ -1,14 +1,17 @@
 package com.pkkor.pandemic.main.game;
 
+import com.pkkor.pandemic.dto.CharacterChoiceDTO;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.cards.CityCards;
 import com.pkkor.pandemic.enums.cards.EpidemicCards;
 import com.pkkor.pandemic.enums.cards.EventCards;
-import com.pkkor.pandemic.enums.characters.Characters;
 import com.pkkor.pandemic.entities.player.Player;
+import com.pkkor.pandemic.services.PlayerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+@Service
 public class Game {
     private List<Card> playerDeck;
     private List<Card> infectionDeck;
@@ -22,11 +25,17 @@ public class Game {
     private int yellowCubes = 24;
     private Map<Card, Integer> infectedCities = new HashMap<>();
     private int infectionRate;
+    private PlayerService playerService;
 
-    public void execute(Characters[] characters, int epidemicNumber) {
-        initialise(characters);
+    @Autowired
+    public Game (PlayerService playerService) {
+        this.playerService = playerService;
+    }
+
+    public void execute(CharacterChoiceDTO characterChoiceDTO) {
+        initialise(characterChoiceDTO);
         dealCards();
-        addEpidemicCards(epidemicNumber);
+        addEpidemicCards(characterChoiceDTO.getPandemicNumber());
         int counter = 3;
         while (counter > 0){
             infectCities(3, counter);
@@ -34,12 +43,14 @@ public class Game {
         }
     }
 
-    private void initialise(Characters[] characters) {
-        players = new ArrayList<>();
-        for (int i = 0; i < characters.length; i++){
-            players.add(new Player(characters[i]));
+    private void initialise(CharacterChoiceDTO characterChoiceDTO) {
+        //TODO: needs to use PlayerDTO coming from characterChoiceDTO (changes in CharacterChoiceDTO also required)
+        //TODO: code needs to be changed to be able to properly create players from PlayerDTO
+        //TODO: conversion needs to be considered using Player and Card mappers
+        for (int i = 1; i <= characterChoiceDTO.getPlayerNumber(); i++) {
+            Player[] players = characterChoiceDTO.getPlayers();
+            playerService.savePlayer(players[i]);
         }
-
         playerDeck = Arrays.asList(CityCards.values());
         playerDeck.addAll(Arrays.asList(EventCards.values()));
         Collections.shuffle(playerDeck);
@@ -53,6 +64,8 @@ public class Game {
     }
 
     private void dealCards() {
+        //TODO: need to resolve the number issue
+        //TODO: this is dependant on playerNumber
         int numberOfCards = 2;
         for (Player p : players){
             for (int i = 0; i < numberOfCards; i++){
