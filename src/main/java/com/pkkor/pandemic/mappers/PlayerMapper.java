@@ -27,6 +27,7 @@ public class PlayerMapper {
         player.setId(Integer.parseInt(stringId));
         player.setCity(playerDTO.getCity());
         player.setActionsNumber(playerDTO.getActionsNumber());
+        
         if (playerDTO.getCards() != null) {
             Card[] cards = (Card[]) Arrays
                     .stream(playerDTO.getCards())
@@ -34,10 +35,8 @@ public class PlayerMapper {
                     .toArray();
             player.setCards(cards);
         }
-        //TODO: sole issue with different string upper/lower between front and back
-        // moreover issue with "_" and all capital letters in backend enums
-        // and spaces in front + second word in the name has capital letter
-        Characters character = Characters.valueOf(playerDTO.getCharacter().toUpperCase().replaceAll(" ", "_"));
+
+        Characters character = convertNameToCharacter(playerDTO);
         player.setCharacter(character);
         player.setName(playerDTO.getName());
         return player;
@@ -47,12 +46,11 @@ public class PlayerMapper {
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setId("player" + player.getId());
         playerDTO.setActionsNumber(player.getActionsNumber());
-        //TODO: sole issue with different string upper/lower between front and back
-        // moreover issue with "_" and all capital letters in backend enums
-        // and spaces in front + second word in the name has capital letter
-        playerDTO.setCharacter(player.getCharacter().getName().charAt(0) + player.getCharacter().getName().substring(1).toLowerCase());
+        String characterName = convertCharacterToName(player);
+        playerDTO.setCharacter(characterName);
         playerDTO.setCity(player.getCity());
         playerDTO.setName(player.getName());
+
         if (player.getCards() != null) {
             CardDTO[] cards = (CardDTO[]) Arrays
                     .stream(player.getCards())
@@ -60,6 +58,29 @@ public class PlayerMapper {
                     .toArray();
             playerDTO.setCards(cards);
         }
+
         return playerDTO;
+    }
+
+    private Characters convertNameToCharacter(PlayerDTO playerDTO) {
+        String characterNameUpperCase = playerDTO.getCharacter().toUpperCase();
+        String characterEnumName = characterNameUpperCase.replaceAll(" ", "_");
+
+        return Characters.valueOf(characterEnumName);
+    }
+
+    private String convertCharacterToName(Player player) {
+        String[] characterParts = player.getCharacter().getName().split("_");
+        StringBuilder characterNameSB = new StringBuilder();
+
+        for (String characterPart : characterParts) {
+            characterNameSB
+                    .append(characterPart.charAt(0))
+                    .append(characterPart.substring(1).toLowerCase())
+                    .append(" ");
+        }
+        characterNameSB.deleteCharAt(characterNameSB.length() - 1);
+
+        return characterNameSB.toString();
     }
 }
