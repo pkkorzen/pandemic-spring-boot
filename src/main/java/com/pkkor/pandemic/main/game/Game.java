@@ -1,11 +1,13 @@
 package com.pkkor.pandemic.main.game;
 
 import com.pkkor.pandemic.dto.CharacterChoiceDTO;
+import com.pkkor.pandemic.dto.PlayerDTO;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.cards.CityCards;
 import com.pkkor.pandemic.enums.cards.EpidemicCards;
 import com.pkkor.pandemic.enums.cards.EventCards;
 import com.pkkor.pandemic.entities.player.Player;
+import com.pkkor.pandemic.mappers.PlayerMapper;
 import com.pkkor.pandemic.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,6 @@ import java.util.*;
 public class Game {
     private List<Card> playerDeck;
     private List<Card> infectionDeck;
-    private List<Player> players;
     private List<Card> infectionDiscardPile;
     private List<Card> playerDiscardPile;
     private int outbreaksCounter;
@@ -26,15 +27,17 @@ public class Game {
     private Map<Card, Integer> infectedCities = new HashMap<>();
     private int infectionRate;
     private PlayerService playerService;
+    private PlayerMapper playerMapper;
 
     @Autowired
-    public Game (PlayerService playerService) {
+    public Game (PlayerService playerService, PlayerMapper playerMapper) {
         this.playerService = playerService;
+        this.playerMapper = playerMapper;
     }
 
     public void execute(CharacterChoiceDTO characterChoiceDTO) {
         initialise(characterChoiceDTO);
-        dealCards();
+        dealCards(characterChoiceDTO);
         addEpidemicCards(characterChoiceDTO.getPandemicNumber());
         int counter = 3;
         while (counter > 0){
@@ -44,12 +47,9 @@ public class Game {
     }
 
     private void initialise(CharacterChoiceDTO characterChoiceDTO) {
-        //TODO: needs to use PlayerDTO coming from characterChoiceDTO (changes in CharacterChoiceDTO also required)
-        //TODO: code needs to be changed to be able to properly create players from PlayerDTO
-        //TODO: conversion needs to be considered using Player and Card mappers
-        for (int i = 1; i <= characterChoiceDTO.getPlayerNumber(); i++) {
-            Player[] players = characterChoiceDTO.getPlayers();
-            playerService.savePlayer(players[i]);
+        for (int i = 0; i < characterChoiceDTO.getPlayerNumber(); i++) {
+            PlayerDTO[] playerDTOs = characterChoiceDTO.getPlayers();
+            playerService.savePlayer(playerMapper.convert(playerDTOs[i]));
         }
         playerDeck = Arrays.asList(CityCards.values());
         playerDeck.addAll(Arrays.asList(EventCards.values()));
@@ -63,10 +63,15 @@ public class Game {
         }
     }
 
-    private void dealCards() {
-        //TODO: need to resolve the number issue
-        //TODO: this is dependant on playerNumber
-        int numberOfCards = 2;
+    private void dealCards(CharacterChoiceDTO characterChoiceDTO) {
+        int numberOfCards;
+        int playerNumber = characterChoiceDTO.getPlayerNumber();
+        if (playerNumber == 3) {
+            numberOfCards = 3;
+        } else {
+            numberOfCards = playerNumber ^ 6;
+        }
+        List<Player> players = playerService.findAllPlayers();
         for (Player p : players){
             for (int i = 0; i < numberOfCards; i++){
                 p.getCards()[i] = playerDeck.get(0);

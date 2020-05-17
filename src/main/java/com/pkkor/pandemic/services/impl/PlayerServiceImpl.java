@@ -27,5 +27,6 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public void savePlayer(Player player) {
+        players.add(player);
     }
 }

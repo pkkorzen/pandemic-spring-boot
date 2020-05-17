@@ -1,11 +1,9 @@
 package com.pkkor.pandemic.dto;
 
-import com.pkkor.pandemic.entities.player.Player;
-
 public class CharacterChoiceDTO {
     int pandemicNumber;
     int playerNumber;
-    Player[] players;
+    PlayerDTO[] playerDTOs;
 
     public int getPandemicNumber() {
         return pandemicNumber;
@@ -23,12 +21,11 @@ public class CharacterChoiceDTO {
         this.playerNumber = playerNumber;
     }
 
-    //TODO: needs to be changed to PlayerDTO
-    public Player[] getPlayers() {
-        return players;
+    public PlayerDTO[] getPlayers() {
+        return playerDTOs;
     }
 
-    public void setPlayers(Player[] players) {
-        this.players = players;
+    public void setPlayers(PlayerDTO[] playerDTOs) {
+        this.playerDTOs = playerDTOs;
     }
 }
