@@ -8,4 +8,5 @@ public interface PlayerService {
     Player findById(int Id);
     List<Player> findAllPlayers();
     void savePlayer(Player player);
+    void clearPlayers();
 }

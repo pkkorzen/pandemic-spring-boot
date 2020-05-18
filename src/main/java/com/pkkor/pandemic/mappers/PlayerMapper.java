@@ -14,10 +14,12 @@ import java.util.Arrays;
 public class PlayerMapper {
 
     private CardMapper cardMapper;
+    private CharacterMapper characterMapper;
 
     @Autowired
-    public PlayerMapper(CardMapper cardMapper) {
+    public PlayerMapper(CardMapper cardMapper, CharacterMapper characterMapper) {
         this.cardMapper = cardMapper;
+        this.characterMapper = characterMapper;
     }
 
     public Player convert (PlayerDTO playerDTO) {
@@ -36,7 +38,7 @@ public class PlayerMapper {
             player.setCards(cards);
         }
 
-        Characters character = convertNameToCharacter(playerDTO);
+        Characters character = characterMapper.convertNameToCharacter(playerDTO.getCharacter());
         player.setCharacter(character);
         player.setName(playerDTO.getName());
         return player;
@@ -46,7 +48,7 @@ public class PlayerMapper {
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setId("player" + player.getId());
         playerDTO.setActionsNumber(player.getActionsNumber());
-        String characterName = convertCharacterToName(player);
+        String characterName = characterMapper.convertCharacterToName(player.getCharacter());
         playerDTO.setCharacter(characterName);
         playerDTO.setCity(player.getCity());
         playerDTO.setName(player.getName());
@@ -60,27 +62,5 @@ public class PlayerMapper {
         }
 
         return playerDTO;
-    }
-
-    private Characters convertNameToCharacter(PlayerDTO playerDTO) {
-        String characterNameUpperCase = playerDTO.getCharacter().toUpperCase();
-        String characterEnumName = characterNameUpperCase.replaceAll(" ", "_");
-
-        return Characters.valueOf(characterEnumName);
-    }
-
-    private String convertCharacterToName(Player player) {
-        String[] characterParts = player.getCharacter().getName().split("_");
-        StringBuilder characterNameSB = new StringBuilder();
-
-        for (String characterPart : characterParts) {
-            characterNameSB
-                    .append(characterPart.charAt(0))
-                    .append(characterPart.substring(1).toLowerCase())
-                    .append(" ");
-        }
-        characterNameSB.deleteCharAt(characterNameSB.length() - 1);
-
-        return characterNameSB.toString();
     }
 }

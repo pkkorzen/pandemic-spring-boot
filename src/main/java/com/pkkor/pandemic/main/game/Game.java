@@ -7,12 +7,16 @@ import com.pkkor.pandemic.enums.cards.CityCards;
 import com.pkkor.pandemic.enums.cards.EpidemicCards;
 import com.pkkor.pandemic.enums.cards.EventCards;
 import com.pkkor.pandemic.entities.player.Player;
+import com.pkkor.pandemic.enums.characters.Characters;
+import com.pkkor.pandemic.mappers.CharacterMapper;
 import com.pkkor.pandemic.mappers.PlayerMapper;
 import com.pkkor.pandemic.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class Game {
     private List<Card> playerDeck;
@@ -28,11 +32,13 @@ public class Game {
     private int infectionRate;
     private PlayerService playerService;
     private PlayerMapper playerMapper;
+    private CharacterMapper characterMapper;
 
     @Autowired
-    public Game (PlayerService playerService, PlayerMapper playerMapper) {
+    public Game (PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper) {
         this.playerService = playerService;
         this.playerMapper = playerMapper;
+        this.characterMapper = characterMapper;
     }
 
     public void execute(CharacterChoiceDTO characterChoiceDTO) {
@@ -47,8 +53,27 @@ public class Game {
     }
 
     private void initialise(CharacterChoiceDTO characterChoiceDTO) {
+        playerService.clearPlayers();
+        PlayerDTO[] playerDTOs = characterChoiceDTO.getPlayers();
+
+        Set<String> charactersChosenString = Arrays
+                .stream(playerDTOs)
+                .map(PlayerDTO::getCharacter)
+                .collect(Collectors.toSet());
+        charactersChosenString.remove("Random");
+
+        List<String> charactersLeft = new ArrayList<>(Arrays.asList(Characters.values()))
+                .stream()
+                .map(x -> characterMapper.convertCharacterToName(x))
+                .collect(Collectors.toList());
+        charactersLeft.removeAll(charactersChosenString);
+
         for (int i = 0; i < characterChoiceDTO.getPlayerNumber(); i++) {
-            PlayerDTO[] playerDTOs = characterChoiceDTO.getPlayers();
+            if (playerDTOs[i].getCharacter().equals("Random")) {
+                Collections.shuffle(charactersLeft);
+                playerDTOs[i].setCharacter(charactersLeft.get(0));
+                charactersLeft.remove(0);
+            }
             playerService.savePlayer(playerMapper.convert(playerDTOs[i]));
         }
         playerDeck = Arrays.asList(CityCards.values());
