@@ -8,7 +8,10 @@ import com.pkkor.pandemic.enums.characters.Characters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class PlayerMapper {
@@ -31,10 +34,11 @@ public class PlayerMapper {
         player.setActionsNumber(playerDTO.getActionsNumber());
         
         if (playerDTO.getCards() != null) {
-            Card[] cards = (Card[]) Arrays
+            Card[] cards = Arrays
                     .stream(playerDTO.getCards())
+                    .filter(Objects::nonNull)
                     .map(x -> cardMapper.convert(x))
-                    .toArray();
+                    .toArray(Card[]::new);
             player.setCards(cards);
         }
 
@@ -54,10 +58,11 @@ public class PlayerMapper {
         playerDTO.setName(player.getName());
 
         if (player.getCards() != null) {
-            CardDTO[] cards = (CardDTO[]) Arrays
+            CardDTO[] cards = Arrays
                     .stream(player.getCards())
+                    .filter(Objects::nonNull)
                     .map(x -> cardMapper.convert(x))
-                    .toArray();
+                    .toArray(CardDTO[]::new);
             playerDTO.setCards(cards);
         }
 

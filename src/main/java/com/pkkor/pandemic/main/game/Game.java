@@ -81,11 +81,11 @@ public class Game {
             p.setActionsNumber(p.getCharacter().getActionsNumber());
         }
 
-        playerDeck = Arrays.asList(CityCards.values());
+        playerDeck = new ArrayList<>(Arrays.asList(CityCards.values()));
         playerDeck.addAll(Arrays.asList(EventCards.values()));
         Collections.shuffle(playerDeck);
 
-        infectionDeck = Arrays.asList(CityCards.values());
+        infectionDeck = new ArrayList<>(Arrays.asList(CityCards.values()));
         Collections.shuffle(infectionDeck);
 
         for (Card c : CityCards.values()){
@@ -133,7 +133,8 @@ public class Game {
     }
 
     private void infectCities(int numberOfCities, int numberOfCubes) {
-        for (int i = 0; i < numberOfCities; i++){
+        infectionDiscardPile = new ArrayList<>();
+        for (int i = 0; i < numberOfCities; i++) {
             Card cardDrawn = infectionDeck.get(i);
             infectionDiscardPile.add(cardDrawn);
             infectedCities.put(cardDrawn, numberOfCubes);
