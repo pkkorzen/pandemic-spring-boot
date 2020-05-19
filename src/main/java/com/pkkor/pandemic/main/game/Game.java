@@ -76,6 +76,11 @@ public class Game {
             }
             playerService.savePlayer(playerMapper.convert(playerDTOs[i]));
         }
+
+        for (Player p : playerService.findAllPlayers()) {
+            p.setActionsNumber(p.getCharacter().getActionsNumber());
+        }
+
         playerDeck = Arrays.asList(CityCards.values());
         playerDeck.addAll(Arrays.asList(EventCards.values()));
         Collections.shuffle(playerDeck);
@@ -97,8 +102,9 @@ public class Game {
             numberOfCards = playerNumber ^ 6;
         }
         List<Player> players = playerService.findAllPlayers();
-        for (Player p : players){
-            for (int i = 0; i < numberOfCards; i++){
+        for (Player p : players) {
+            p.setCards(new Card[p.getCharacter().getCardsNumber()]);
+            for (int i = 0; i < numberOfCards; i++) {
                 p.getCards()[i] = playerDeck.get(0);
                 playerDeck.remove(0);
             }
