@@ -23,6 +23,7 @@ public class Game {
     private List<Card> infectionDeck;
     private List<Card> infectionDiscardPile;
     private List<Card> playerDiscardPile;
+    private Queue<Player> playerOrder;
     private int outbreaksCounter;
     private int blueCubes = 24;
     private int blackCubes = 24;
@@ -46,10 +47,11 @@ public class Game {
         dealCards(characterChoiceDTO);
         addEpidemicCards(characterChoiceDTO.getPandemicNumber());
         int counter = 3;
-        while (counter > 0){
+        while (counter > 0) {
             infectCities(3, counter);
             counter--;
         }
+        orderPlayers();
     }
 
     private void initialise(CharacterChoiceDTO characterChoiceDTO) {
@@ -140,6 +142,7 @@ public class Game {
             infectedCities.put(cardDrawn, numberOfCubes);
             distributeCubes(cardDrawn, numberOfCubes);
         }
+        infectionDeck.removeAll(infectionDiscardPile);
     }
 
     private void distributeCubes(Card cardDrawn, int numberOfCubes) {
@@ -160,6 +163,17 @@ public class Game {
             if (yellowCubes < 0){
                 break;
             }
+        }
+    }
+
+    private void orderPlayers() {
+        playerOrder = new LinkedList<>();
+        
+        List<Player> players = new ArrayList<>(playerService.findAllPlayers());
+        Collections.shuffle(players);
+
+        for (Player p: players) {
+            playerOrder.offer(p);
         }
     }
 }
