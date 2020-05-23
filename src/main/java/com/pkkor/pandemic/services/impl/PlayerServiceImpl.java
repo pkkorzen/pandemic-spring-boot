@@ -28,6 +28,8 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void savePlayer(Player player) {
         players.add(player);
+        players.add(player.getId() - 1, player);
+        players.remove(player.getId());
     }
 
     @Override
