@@ -1,19 +1,26 @@
 package com.pkkor.pandemic.main.game;
 
+import com.google.gson.Gson;
 import com.pkkor.pandemic.dto.CharacterChoiceDTO;
 import com.pkkor.pandemic.dto.PlayerDTO;
+import com.pkkor.pandemic.entities.connection.Connection;
+import com.pkkor.pandemic.entities.player.Player;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.cards.CityCards;
 import com.pkkor.pandemic.enums.cards.EpidemicCards;
 import com.pkkor.pandemic.enums.cards.EventCards;
-import com.pkkor.pandemic.entities.player.Player;
 import com.pkkor.pandemic.enums.characters.Characters;
 import com.pkkor.pandemic.mappers.CharacterMapper;
 import com.pkkor.pandemic.mappers.PlayerMapper;
 import com.pkkor.pandemic.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +31,7 @@ public class Game {
     private List<Card> infectionDiscardPile;
     private List<Card> playerDiscardPile;
     private Queue<Player> playerOrder;
+    private Map<String, List<String>> connections;
     private int outbreaksCounter;
     private int blueCubes = 24;
     private int blackCubes = 24;
@@ -36,7 +44,7 @@ public class Game {
     private CharacterMapper characterMapper;
 
     @Autowired
-    public Game (PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper) {
+    public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper) {
         this.playerService = playerService;
         this.playerMapper = playerMapper;
         this.characterMapper = characterMapper;
@@ -90,8 +98,25 @@ public class Game {
         infectionDeck = new ArrayList<>(Arrays.asList(CityCards.values()));
         Collections.shuffle(infectionDeck);
 
-        for (Card c : CityCards.values()){
+        for (Card c : CityCards.values()) {
             infectedCities.put(c, 0);
+        }
+
+        playerDiscardPile = new ArrayList<>();
+        infectionDiscardPile = new ArrayList<>();
+        connections = new HashMap<>();
+
+        try {
+            File file = new ClassPathResource("connections.json").getFile();
+            String connectionsString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            Gson gson = new Gson();
+            Connection[] connectionsArray = gson.fromJson(connectionsString, Connection[].class);
+            for (Connection c : connectionsArray) {
+                connections.computeIfAbsent(c.getFrom(), k -> new ArrayList<>());
+                connections.get(c.getFrom()).add(c.getTo());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -117,17 +142,17 @@ public class Game {
         List<List<Card>> partialDecks = new ArrayList<>();
         int partialDeckSize = playerDeck.size() / epidemicNumber;
         int remainingCardsNumber = playerDeck.size() % epidemicNumber;
-        for (int i = remainingCardsNumber; i < epidemicNumber; i++){
-            partialDecks.add(new ArrayList<>(playerDeck.subList(i, i+partialDeckSize)));
+        for (int i = remainingCardsNumber; i < epidemicNumber; i++) {
+            partialDecks.add(new ArrayList<>(playerDeck.subList(i, i + partialDeckSize)));
         }
         //adding remaining cards to the first partialDeck
-        for (int i = 0; i < remainingCardsNumber; i++){
+        for (int i = 0; i < remainingCardsNumber; i++) {
             List<Card> firstPartialDeck = partialDecks.get(0);
             firstPartialDeck.add(playerDeck.get(i));
         }
         playerDeck.clear();
 
-        for (List<Card> l : partialDecks){
+        for (List<Card> l : partialDecks) {
             l.add(EpidemicCards.EPIDEMIC);
             Collections.shuffle(l);
             playerDeck.addAll(l);
@@ -135,7 +160,6 @@ public class Game {
     }
 
     private void infectCities(int numberOfCities, int numberOfCubes) {
-        infectionDiscardPile = new ArrayList<>();
         for (int i = 0; i < numberOfCities; i++) {
             Card cardDrawn = infectionDeck.get(i);
             infectionDiscardPile.add(cardDrawn);
@@ -146,34 +170,74 @@ public class Game {
     }
 
     private void distributeCubes(Card cardDrawn, int numberOfCubes) {
-        switch (cardDrawn.getColor()){
-            case BLUE: blueCubes =- numberOfCubes;
-            if (blueCubes < 0 ){
-                break;
-            }
-            case BLACK: blackCubes =- numberOfCubes;
-            if (blackCubes < 0){
-                break;
-            }
-            case RED: redCubes =- numberOfCubes;
-            if (redCubes < 0){
-                break;
-            }
-            case YELLOW: yellowCubes =- numberOfCubes;
-            if (yellowCubes < 0){
-                break;
-            }
+        switch (cardDrawn.getColor()) {
+            case BLUE:
+                blueCubes = -numberOfCubes;
+                if (blueCubes < 0) {
+                    break;
+                }
+            case BLACK:
+                blackCubes = -numberOfCubes;
+                if (blackCubes < 0) {
+                    break;
+                }
+            case RED:
+                redCubes = -numberOfCubes;
+                if (redCubes < 0) {
+                    break;
+                }
+            case YELLOW:
+                yellowCubes = -numberOfCubes;
+                if (yellowCubes < 0) {
+                    break;
+                }
         }
     }
 
     private void orderPlayers() {
         playerOrder = new LinkedList<>();
-        
+
         List<Player> players = new ArrayList<>(playerService.findAllPlayers());
         Collections.shuffle(players);
 
-        for (Player p: players) {
+        for (Player p : players) {
             playerOrder.offer(p);
         }
+    }
+
+    public void move(String location) {
+        Player activePlayer = playerOrder.peek();
+        List<String> activePlayerLocationConnections = connections.get(activePlayer.getCity());
+        boolean validMove;
+
+        if (activePlayerLocationConnections == null) {
+            activePlayerLocationConnections = connections.get(location);
+            validMove = isValidMove(activePlayerLocationConnections, activePlayer.getCity());
+        } else {
+            validMove = isValidMove(activePlayerLocationConnections, location);
+        }
+
+        if (validMove) {
+            activePlayer.setCity(location);
+        } else {
+            Card[] playerCards = activePlayer.getCards();
+            for (int i = 0; i < playerCards.length; i++) {
+                if (playerCards[i].getName().equals(location)) {
+                    activePlayer.setCity(location);
+                    playerDiscardPile.add(playerCards[i]);
+                    playerCards[i] = null;
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean isValidMove(List<String> activePlayerLocationConnections, String location) {
+        for (String activePlayerLocationConnection : activePlayerLocationConnections) {
+            if (activePlayerLocationConnection.equals(location)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

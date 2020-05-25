@@ -1,0 +1,386 @@
+[
+  {
+    "from": "San Francisco",
+    "to": "Tokyo"
+  },
+  {
+    "from": "San Francisco",
+    "to": "Manila"
+  },
+  {
+    "from": "San Francisco",
+    "to": "Los Angeles"
+  },
+  {
+    "from": "San Francisco",
+    "to": "Chicago"
+  },
+  {
+    "from": "Chicago",
+    "to": "Los Angeles"
+  },
+  {
+    "from": "Chicago",
+    "to": "Mexico City"
+  },
+  {
+    "from": "Chicago",
+    "to": "Atlanta"
+  },
+  {
+    "from": "Chicago",
+    "to": "Montreal"
+  },
+  {
+    "from": "Montreal",
+    "to": "Washington"
+  },
+  {
+    "from": "Montreal",
+    "to": "New York"
+  },
+  {
+    "from": "New York",
+    "to": "Washington"
+  },
+  {
+    "from": "New York",
+    "to": "London"
+  },
+  {
+    "from": "New York",
+    "to": "Madrid"
+  },
+  {
+    "from": "Atlanta",
+    "to": "Washington"
+  },
+  {
+    "from": "Atlanta",
+    "to": "Miami"
+  },
+  {
+    "from": "Washington",
+    "to": "Miami"
+  },
+  {
+    "from": "London",
+    "to": "Madrid"
+  },
+  {
+    "from": "London",
+    "to": "Paris"
+  },
+  {
+    "from": "London",
+    "to": "Essen"
+  },
+  {
+    "from": "Madrid",
+    "to": "Sao Paulo"
+  },
+  {
+    "from": "Madrid",
+    "to": "Paris"
+  },
+  {
+    "from": "Madrid",
+    "to": "Algiers"
+  },
+  {
+    "from": "Paris",
+    "to": "Essen"
+  },
+  {
+    "from": "Paris",
+    "to": "Milan"
+  },
+  {
+    "from": "Paris",
+    "to": "Algiers"
+  },
+  {
+    "from": "Essen",
+    "to": "St. Petersburg"
+  },
+  {
+    "from": "Essen",
+    "to": "Milan"
+  },
+  {
+    "from": "Milan",
+    "to": "Istanbul"
+  },
+  {
+    "from": "St. Petersburg",
+    "to": "Moscow"
+  },
+  {
+    "from": "St. Petersburg",
+    "to": "Istanbul"
+  },
+  {
+    "from": "Los Angeles",
+    "to": "Sydney"
+  },
+  {
+    "from": "Los Angeles",
+    "to": "Mexico City"
+  },
+  {
+    "from": "Mexico City",
+    "to": "Miami"
+  },
+  {
+    "from": "Mexico City",
+    "to": "Lima"
+  },
+  {
+    "from": "Mexico City",
+    "to": "Bogota"
+  },
+  {
+    "from": "Miami",
+    "to": "Bogota"
+  },
+  {
+    "from": "Bogota",
+    "to": "Lima"
+  },
+  {
+    "from": "Bogota",
+    "to": "Buenos Aires"
+  },
+  {
+    "from": "Bogota",
+    "to": "Sao Paulo"
+  },
+  {
+    "from": "Lima",
+    "to": "Santiago"
+  },
+  {
+    "from": "Buenos Aires",
+    "to": "Sao Paulo"
+  },
+  {
+    "from": "Sao Paulo",
+    "to": "Lagos"
+  },
+  {
+    "from": "Lagos",
+    "to": "Khartoum"
+  },
+  {
+    "from": "Lagos",
+    "to": "Kinshasa"
+  },
+  {
+    "from": "Khartoum",
+    "to": "Cairo"
+  },
+  {
+    "from": "Khartoum",
+    "to": "Kinshasa"
+  },
+  {
+    "from": "Khartoum",
+    "to": "Johannesburg"
+  },
+  {
+    "from": "Kinshasa",
+    "to": "Johannesburg"
+  },
+  {
+    "from": "Algiers",
+    "to": "Istanbul"
+  },
+  {
+    "from": "Algiers",
+    "to": "Cairo"
+  },
+  {
+    "from": "Cairo",
+    "to": "Istanbul"
+  },
+  {
+    "from": "Cairo",
+    "to": "Baghdad"
+  },
+  {
+    "from": "Cairo",
+    "to": "Riyadh"
+  },
+  {
+    "from": "Istanbul",
+    "to": "Moscow"
+  },
+  {
+    "from": "Istanbul",
+    "to": "Baghdad"
+  },
+  {
+    "from": "Moscow",
+    "to": "Tehran"
+  },
+  {
+    "from": "Tehran",
+    "to": "Delhi"
+  },
+  {
+    "from": "Tehran",
+    "to": "Karachi"
+  },
+  {
+    "from": "Tehran",
+    "to": "Baghdad"
+  },
+  {
+    "from": "Baghdad",
+    "to": "Karachi"
+  },
+  {
+    "from": "Baghdad",
+    "to": "Riyadh"
+  },
+  {
+    "from": "Riyadh",
+    "to": "Karachi"
+  },
+  {
+    "from": "Mumbai",
+    "to": "Delhi"
+  },
+  {
+    "from": "Mumbai",
+    "to": "Karachi"
+  },
+  {
+    "from": "Mumbai",
+    "to": "Chennai"
+  },
+  {
+    "from": "Karachi",
+    "to": "Delhi"
+  },
+  {
+    "from": "Delhi",
+    "to": "Kolkata"
+  },
+  {
+    "from": "Delhi",
+    "to": "Chennai"
+  },
+  {
+    "from": "Chennai",
+    "to": "Kolkata"
+  },
+  {
+    "from": "Chennai",
+    "to": "Bangkok"
+  },
+  {
+    "from": "Chennai",
+    "to": "Jakarta"
+  },
+  {
+    "from": "Kolkata",
+    "to": "Hong Kong"
+  },
+  {
+    "from": "Kolkata",
+    "to": "Bangkok"
+  },
+  {
+    "from": "Bangkok",
+    "to": "Hong Kong"
+  },
+  {
+    "from": "Bangkok",
+    "to": "Ho Chi Minh City"
+  },
+  {
+    "from": "Bangkok",
+    "to": "Jakarta"
+  },
+  {
+    "from": "Jakarta",
+    "to": "Ho Chi Minh City"
+  },
+  {
+    "from": "Jakarta",
+    "to": "Sydney"
+  },
+  {
+    "from": "Ho Chi Minh City",
+    "to": "Hong Kong"
+  },
+  {
+    "from": "Ho Chi Minh City",
+    "to": "Manila"
+  },
+  {
+    "from": "Hong Kong",
+    "to": "Shanghai"
+  },
+  {
+    "from": "Hong Kong",
+    "to": "Taipei"
+  },
+  {
+    "from": "Hong Kong",
+    "to": "Manila"
+  },
+  {
+    "from": "Shanghai",
+    "to": "Beijing"
+  },
+  {
+    "from": "Shanghai",
+    "to": "Seoul"
+  },
+  {
+    "from": "Shanghai",
+    "to": "Tokyo"
+  },
+  {
+    "from": "Shanghai",
+    "to": "Taipei"
+  },
+  {
+    "from": "Beijing",
+    "to": "Seoul"
+  },
+  {
+    "from": "Seoul",
+    "to": "Tokyo"
+  },
+  {
+    "from": "Tokyo",
+    "to": "Osaka"
+  },
+  {
+    "from": "Osaka",
+    "to": "Taipei"
+  },
+  {
+    "from": "Taipei",
+    "to": "Manila"
+  },
+  {
+    "from": "Manila",
+    "to": "Sydney"
+  },
+  {
+    "from": "Tokyo",
+    "to": "San Francisco"
+  },
+  {
+    "from": "Manila",
+    "to": "San Francisco"
+  },
+  {
+    "from": "Sydney",
+    "to": "Los Angeles"
+  }
+]
