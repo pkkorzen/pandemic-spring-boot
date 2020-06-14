@@ -5,6 +5,8 @@ import com.pkkor.pandemic.dto.PlayerDTO;
 import com.pkkor.pandemic.entities.player.Player;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
+import com.pkkor.pandemic.simple_factory.factory.PlayerCreator;
+import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,20 +20,22 @@ public class PlayerMapper {
 
     private CardMapper cardMapper;
     private CharacterMapper characterMapper;
+    private PlayerCreator playerCreator;
 
     @Autowired
-    public PlayerMapper(CardMapper cardMapper, CharacterMapper characterMapper) {
+    public PlayerMapper(CardMapper cardMapper, CharacterMapper characterMapper, PlayerCreator playerCreator) {
         this.cardMapper = cardMapper;
         this.characterMapper = characterMapper;
+        this.playerCreator = playerCreator;
     }
 
-    public Player convert (PlayerDTO playerDTO) {
-        Player player = new Player();
+    public AbstractPlayer convert (PlayerDTO playerDTO) {
         int numberIndex = playerDTO.getId().length() - 1;
         String stringId = playerDTO.getId().substring(numberIndex);
-        player.setId(Integer.parseInt(stringId));
+        Characters character = characterMapper.convertNameToCharacter(playerDTO.getCharacter());
+        String playerName = playerDTO.getName();
+        AbstractPlayer player = playerCreator.createPlayer(character, Integer.parseInt(stringId), playerName);
         player.setCity(playerDTO.getCity());
-        player.setActionsNumber(playerDTO.getActionsNumber());
         
         if (playerDTO.getCards() != null) {
             Card[] cards = Arrays
@@ -42,13 +46,10 @@ public class PlayerMapper {
             player.setCards(cards);
         }
 
-        Characters character = characterMapper.convertNameToCharacter(playerDTO.getCharacter());
-        player.setCharacter(character);
-        player.setName(playerDTO.getName());
         return player;
     }
 
-    public PlayerDTO convert (Player player) {
+    public PlayerDTO convert (AbstractPlayer player) {
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setId("player" + player.getId());
         playerDTO.setActionsNumber(player.getActionsNumber());

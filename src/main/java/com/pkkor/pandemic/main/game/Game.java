@@ -13,6 +13,8 @@ import com.pkkor.pandemic.enums.characters.Characters;
 import com.pkkor.pandemic.mappers.CharacterMapper;
 import com.pkkor.pandemic.mappers.PlayerMapper;
 import com.pkkor.pandemic.services.PlayerService;
+import com.pkkor.pandemic.simple_factory.factory.PlayerCreator;
+import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class Game {
     private List<Card> infectionDeck;
     private List<Card> infectionDiscardPile;
     private List<Card> playerDiscardPile;
-    private Queue<Player> playerOrder;
+    private Queue<AbstractPlayer> playerOrder;
     private Map<String, List<String>> connections;
     private int outbreaksCounter;
     private int blueCubes = 24;
@@ -42,12 +44,14 @@ public class Game {
     private PlayerService playerService;
     private PlayerMapper playerMapper;
     private CharacterMapper characterMapper;
+    private PlayerCreator playerCreator;
 
     @Autowired
-    public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper) {
+    public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper, PlayerCreator playerCreator) {
         this.playerService = playerService;
         this.playerMapper = playerMapper;
         this.characterMapper = characterMapper;
+        this.playerCreator = playerCreator;
     }
 
     public void execute(CharacterChoiceDTO characterChoiceDTO) {
@@ -84,11 +88,11 @@ public class Game {
                 playerDTOs[i].setCharacter(charactersLeft.get(0));
                 charactersLeft.remove(0);
             }
-            playerService.savePlayer(playerMapper.convert(playerDTOs[i]));
-        }
-
-        for (Player p : playerService.findAllPlayers()) {
-            p.setActionsNumber(p.getCharacter().getActionsNumber());
+            int playerId = convertId(playerDTOs[i]);
+            String playerName = playerDTOs[i].getName();
+            Characters character = characterMapper.convertNameToCharacter(playerDTOs[i].getCharacter());
+            AbstractPlayer player = playerCreator.createPlayer(character, playerId, playerName);
+            playerService.savePlayer(player);
         }
 
         playerDeck = new ArrayList<>(Arrays.asList(CityCards.values()));
@@ -128,9 +132,8 @@ public class Game {
         } else {
             numberOfCards = playerNumber ^ 6;
         }
-        List<Player> players = playerService.findAllPlayers();
-        for (Player p : players) {
-            p.setCards(new Card[p.getCharacter().getCardsNumber()]);
+        List<AbstractPlayer> players = playerService.findAllPlayers();
+        for (AbstractPlayer p : players) {
             for (int i = 0; i < numberOfCards; i++) {
                 p.getCards()[i] = playerDeck.get(0);
                 playerDeck.remove(0);
@@ -197,16 +200,16 @@ public class Game {
     private void orderPlayers() {
         playerOrder = new LinkedList<>();
 
-        List<Player> players = new ArrayList<>(playerService.findAllPlayers());
+        List<AbstractPlayer> players = new ArrayList<>(playerService.findAllPlayers());
         Collections.shuffle(players);
 
-        for (Player p : players) {
+        for (AbstractPlayer p : players) {
             playerOrder.offer(p);
         }
     }
 
     public void move(String location) {
-        Player activePlayer = playerOrder.peek();
+        AbstractPlayer activePlayer = playerOrder.peek();
         List<String> activePlayerLocationConnections = connections.get(activePlayer.getCity());
         boolean validMove;
 
@@ -239,5 +242,11 @@ public class Game {
             }
         }
         return false;
+    }
+
+    private int convertId(PlayerDTO playerDTO) {
+        int numberIndex = playerDTO.getId().length() - 1;
+        String stringId = playerDTO.getId().substring(numberIndex);
+        return Integer.parseInt(stringId);
     }
 }
