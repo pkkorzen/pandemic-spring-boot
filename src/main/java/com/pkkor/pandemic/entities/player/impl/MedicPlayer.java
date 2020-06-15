@@ -1,10 +1,10 @@
-package com.pkkor.pandemic.simple_factory.players.impl;
+package com.pkkor.pandemic.entities.player.impl;
 
 import com.pkkor.pandemic.actions.impl.basic.*;
-import com.pkkor.pandemic.actions.impl.medic.MedicATreatAction;
+import com.pkkor.pandemic.actions.impl.medic.MedicTreatAction;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 
 public class MedicPlayer extends AbstractPlayer {
 
@@ -12,10 +12,10 @@ public class MedicPlayer extends AbstractPlayer {
         character = Characters.MEDIC;
         city = "Atlanta";
         actionsNumber = 4;
-        cards = new Card[6];
+        cards = new Card[7];
         moveAction = new BasicMoveAction();
         buildAction = new BasicBuildAction();
-        treatAction = new MedicATreatAction();
+        treatAction = new MedicTreatAction();
         knowledgeSharingAction = new BasicShareAction();
         cureAction = new BasicCureAction();
     }

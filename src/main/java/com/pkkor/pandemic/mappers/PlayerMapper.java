@@ -2,18 +2,15 @@ package com.pkkor.pandemic.mappers;
 
 import com.pkkor.pandemic.dto.CardDTO;
 import com.pkkor.pandemic.dto.PlayerDTO;
-import com.pkkor.pandemic.entities.player.Player;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
-import com.pkkor.pandemic.simple_factory.factory.PlayerCreator;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.factory.PlayerCreator;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class PlayerMapper {

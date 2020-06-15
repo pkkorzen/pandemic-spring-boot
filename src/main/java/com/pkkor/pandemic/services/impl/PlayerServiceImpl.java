@@ -1,8 +1,7 @@
 package com.pkkor.pandemic.services.impl;
 
-import com.pkkor.pandemic.entities.player.Player;
 import com.pkkor.pandemic.services.PlayerService;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

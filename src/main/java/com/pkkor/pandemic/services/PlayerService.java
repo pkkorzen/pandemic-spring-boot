@@ -1,7 +1,6 @@
 package com.pkkor.pandemic.services;
 
-import com.pkkor.pandemic.entities.player.Player;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 
 import java.util.List;
 

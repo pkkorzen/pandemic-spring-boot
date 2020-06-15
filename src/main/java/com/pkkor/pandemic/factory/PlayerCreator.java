@@ -1,8 +1,8 @@
-package com.pkkor.pandemic.simple_factory.factory;
+package com.pkkor.pandemic.factory;
 
+import com.pkkor.pandemic.entities.player.impl.*;
 import com.pkkor.pandemic.enums.characters.Characters;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
-import com.pkkor.pandemic.simple_factory.players.impl.*;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import org.springframework.stereotype.Component;
 
 @Component

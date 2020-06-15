@@ -13,15 +13,15 @@ public abstract class AbstractMoveAction implements Action {
             //TODO: still need to figure out how to decide on correct move, when two out of those three are true
             //TODO: another ifs are required to be sure, which two out of three moves are valid and decide
             // which one to choose
-        /*} else if (specialMoveValid() && directFlightValid() && charterFlightValid()) {*/
+            /*} else if (specialMoveValid() && directFlightValid() && charterFlightValid()) {*/
 
         } else if (specialMoveValid()) {
             if (directFlightValid()) {
-               if (charterFlightValid()) {
-                   //special, direct and charter logic
-               } else {
-                   //special and direct logic
-               }
+                if (charterFlightValid()) {
+                    //special, direct and charter logic
+                } else {
+                    //special and direct logic
+                }
             } else if (charterFlightValid()) {
                 //special and charter logic
             } else {

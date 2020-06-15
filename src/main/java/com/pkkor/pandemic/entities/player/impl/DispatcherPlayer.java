@@ -1,10 +1,10 @@
-package com.pkkor.pandemic.simple_factory.players.impl;
+package com.pkkor.pandemic.entities.player.impl;
 
 import com.pkkor.pandemic.actions.impl.basic.*;
-import com.pkkor.pandemic.actions.impl.dispatcher.DispatcherAMoveAction;
+import com.pkkor.pandemic.actions.impl.dispatcher.DispatcherMoveAction;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 
 public class DispatcherPlayer extends AbstractPlayer {
 
@@ -12,8 +12,8 @@ public class DispatcherPlayer extends AbstractPlayer {
         character = Characters.DISPATCHER;
         city = "Atlanta";
         actionsNumber = 4;
-        cards = new Card[6];
-        moveAction = new DispatcherAMoveAction();
+        cards = new Card[7];
+        moveAction = new DispatcherMoveAction();
         buildAction = new BasicBuildAction();
         treatAction = new BasicTreatAction();
         knowledgeSharingAction = new BasicShareAction();

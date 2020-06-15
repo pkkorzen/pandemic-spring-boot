@@ -1,17 +1,17 @@
-package com.pkkor.pandemic.simple_factory.players.impl;
+package com.pkkor.pandemic.entities.player.impl;
 
 import com.pkkor.pandemic.actions.impl.basic.*;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
-import com.pkkor.pandemic.simple_factory.players.AbstractPlayer;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 
-public class ContingencyPlannerPlayer extends AbstractPlayer {
+public class QuarantineSpecialistPlayer extends AbstractPlayer {
 
-    public ContingencyPlannerPlayer() {
-        character = Characters.CONTINGENCY_PLANNER;
+    public QuarantineSpecialistPlayer() {
+        character = Characters.QUARANTINE_SPECIALIST;
         city = "Atlanta";
         actionsNumber = 4;
-        cards = new Card[6];
+        cards = new Card[7];
         moveAction = new BasicMoveAction();
         buildAction = new BasicBuildAction();
         treatAction = new BasicTreatAction();
@@ -19,7 +19,7 @@ public class ContingencyPlannerPlayer extends AbstractPlayer {
         cureAction = new BasicCureAction();
     }
 
-    public ContingencyPlannerPlayer(int id, String name) {
+    public QuarantineSpecialistPlayer(int id, String name) {
         this();
         this.id = id;
         this.name = name;

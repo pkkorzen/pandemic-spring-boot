@@ -1,4 +1,4 @@
-package com.pkkor.pandemic.simple_factory.players;
+package com.pkkor.pandemic.entities.player;
 
 import com.pkkor.pandemic.actions.Action;
 import com.pkkor.pandemic.enums.cards.Card;

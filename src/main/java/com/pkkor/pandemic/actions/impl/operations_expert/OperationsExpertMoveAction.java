@@ -1,8 +1,9 @@
-package com.pkkor.pandemic.actions.impl.dispatcher;
+package com.pkkor.pandemic.actions.impl.operations_expert;
 
 import com.pkkor.pandemic.actions.AbstractMoveAction;
 
-public class DispatcherAMoveAction extends AbstractMoveAction {
+public class OperationsExpertMoveAction extends AbstractMoveAction {
+
     @Override
     protected boolean specialMoveValid() {
         return false;
