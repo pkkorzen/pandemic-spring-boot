@@ -1,27 +1,23 @@
 package com.pkkor.pandemic.main.game;
 
-import com.google.gson.Gson;
 import com.pkkor.pandemic.dto.CharacterChoiceDTO;
 import com.pkkor.pandemic.dto.PlayerDTO;
-import com.pkkor.pandemic.entities.connection.Connection;
+import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.cards.CityCards;
 import com.pkkor.pandemic.enums.cards.EpidemicCards;
 import com.pkkor.pandemic.enums.cards.EventCards;
 import com.pkkor.pandemic.enums.characters.Characters;
+import com.pkkor.pandemic.factory.PlayerCreator;
 import com.pkkor.pandemic.mappers.CharacterMapper;
 import com.pkkor.pandemic.mappers.PlayerMapper;
+import com.pkkor.pandemic.services.ConnectionsService;
+import com.pkkor.pandemic.services.PlayerDiscardPileService;
+import com.pkkor.pandemic.services.PlayerOrderService;
 import com.pkkor.pandemic.services.PlayerService;
-import com.pkkor.pandemic.factory.PlayerCreator;
-import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,9 +26,6 @@ public class Game {
     private List<Card> playerDeck;
     private List<Card> infectionDeck;
     private List<Card> infectionDiscardPile;
-    private List<Card> playerDiscardPile;
-    private Queue<AbstractPlayer> playerOrder;
-    private Map<String, List<String>> connections;
     private int outbreaksCounter;
     private int blueCubes = 24;
     private int blackCubes = 24;
@@ -44,13 +37,21 @@ public class Game {
     private PlayerMapper playerMapper;
     private CharacterMapper characterMapper;
     private PlayerCreator playerCreator;
+    private ConnectionsService connectionsService;
+    private PlayerOrderService playerOrderService;
+    private PlayerDiscardPileService playerDiscardPileService;
 
     @Autowired
-    public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper, PlayerCreator playerCreator) {
+    public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper,
+                PlayerCreator playerCreator, ConnectionsService connectionsService,
+                PlayerOrderService playerOrderService, PlayerDiscardPileService playerDiscardPileService) {
         this.playerService = playerService;
         this.playerMapper = playerMapper;
         this.characterMapper = characterMapper;
         this.playerCreator = playerCreator;
+        this.connectionsService = connectionsService;
+        this.playerOrderService = playerOrderService;
+        this.playerDiscardPileService = playerDiscardPileService;
     }
 
     public void execute(CharacterChoiceDTO characterChoiceDTO) {
@@ -105,22 +106,8 @@ public class Game {
             infectedCities.put(c, 0);
         }
 
-        playerDiscardPile = new ArrayList<>();
         infectionDiscardPile = new ArrayList<>();
-        connections = new HashMap<>();
 
-        try {
-            File file = new ClassPathResource("connections.json").getFile();
-            String connectionsString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-            Gson gson = new Gson();
-            Connection[] connectionsArray = gson.fromJson(connectionsString, Connection[].class);
-            for (Connection c : connectionsArray) {
-                connections.computeIfAbsent(c.getFrom(), k -> new ArrayList<>());
-                connections.get(c.getFrom()).add(c.getTo());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void dealCards(CharacterChoiceDTO characterChoiceDTO) {
@@ -197,18 +184,19 @@ public class Game {
     }
 
     private void orderPlayers() {
-        playerOrder = new LinkedList<>();
 
         List<AbstractPlayer> players = new ArrayList<>(playerService.findAllPlayers());
         Collections.shuffle(players);
 
         for (AbstractPlayer p : players) {
-            playerOrder.offer(p);
+            playerOrderService.insertIntoQueue(p);
         }
     }
 
     public void move(String location) {
-        AbstractPlayer activePlayer = playerOrder.peek();
+        AbstractPlayer activePlayer = playerOrderService.getActivePlayer();
+        Map<String, List<String>> connections = connectionsService.getConnections();
+
         List<String> activePlayerLocationConnections = connections.get(activePlayer.getCity());
         boolean validMove;
 
@@ -226,7 +214,7 @@ public class Game {
             for (int i = 0; i < playerCards.length; i++) {
                 if (playerCards[i].getName().equals(location)) {
                     activePlayer.setCity(location);
-                    playerDiscardPile.add(playerCards[i]);
+                    playerDiscardPileService.addToDiscardPile(playerCards[i]);
                     playerCards[i] = null;
                     break;
                 }
