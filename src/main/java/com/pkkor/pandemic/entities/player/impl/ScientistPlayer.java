@@ -25,4 +25,29 @@ public class ScientistPlayer extends AbstractPlayer {
         this.id = id;
         this.name = name;
     }
+
+    @Override
+    public void build() {
+        buildAction.execute();
+    }
+
+    @Override
+    public void cure() {
+        cureAction.execute();
+    }
+
+    @Override
+    public void move() {
+        moveAction.execute();
+    }
+
+    @Override
+    public void share() {
+        knowledgeSharingAction.execute();
+    }
+
+    @Override
+    public void treat() {
+        treatAction.execute();
+    }
 }

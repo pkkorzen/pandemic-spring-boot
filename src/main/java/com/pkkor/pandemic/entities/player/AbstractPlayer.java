@@ -104,4 +104,10 @@ public abstract class AbstractPlayer {
     public void setCureAction(Action cureAction) {
         this.cureAction = cureAction;
     }
+
+    public abstract void build();
+    public abstract void cure();
+    public abstract void move();
+    public abstract void share();
+    public abstract void treat();
 }
