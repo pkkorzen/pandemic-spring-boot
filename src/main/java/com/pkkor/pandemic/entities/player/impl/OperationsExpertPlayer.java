@@ -29,26 +29,26 @@ public class OperationsExpertPlayer extends AbstractPlayer {
 
     @Override
     public void build() {
-        buildAction.execute();
+        buildAction.execute(this);
     }
 
     @Override
     public void cure() {
-        cureAction.execute();
+        cureAction.execute(this);
     }
 
     @Override
-    public void move() {
-        moveAction.execute();
+    public void move(String... args) {
+        moveAction.execute(this, args);
     }
 
     @Override
     public void share() {
-        knowledgeSharingAction.execute();
+        knowledgeSharingAction.execute(this);
     }
 
     @Override
     public void treat() {
-        treatAction.execute();
+        treatAction.execute(this);
     }
 }

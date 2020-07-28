@@ -4,6 +4,8 @@ import com.pkkor.pandemic.actions.impl.basic.*;
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.enums.characters.Characters;
 import com.pkkor.pandemic.entities.player.AbstractPlayer;
+import com.pkkor.pandemic.services.ConnectionsService;
+import com.pkkor.pandemic.services.PlayerDiscardPileService;
 
 public class ContingencyPlannerPlayer extends AbstractPlayer {
 
@@ -27,26 +29,26 @@ public class ContingencyPlannerPlayer extends AbstractPlayer {
 
     @Override
     public void build() {
-        buildAction.execute();
+        buildAction.execute(this);
     }
 
     @Override
     public void cure() {
-        cureAction.execute();
+        cureAction.execute(this);
     }
 
     @Override
-    public void move() {
-        moveAction.execute();
+    public void move(String... args) {
+        moveAction.execute(this, args);
     }
 
     @Override
     public void share() {
-        knowledgeSharingAction.execute();
+        knowledgeSharingAction.execute(this);
     }
 
     @Override
     public void treat() {
-        treatAction.execute();
+        treatAction.execute(this);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -18,6 +19,14 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public AbstractPlayer findById(int Id) {
         return players.get(Id);
+    }
+
+    @Override
+    public List<AbstractPlayer> findByCity(String city) {
+        return players
+                .stream()
+                .filter(x -> x.getCity().equals(city))
+                .collect(Collectors.toList());
     }
 
     @Override

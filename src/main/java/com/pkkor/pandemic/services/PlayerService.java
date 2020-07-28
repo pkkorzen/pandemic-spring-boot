@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface PlayerService {
     AbstractPlayer findById(int Id);
+    List<AbstractPlayer> findByCity(String city);
     List<AbstractPlayer> findAllPlayers();
     void savePlayer(AbstractPlayer player);
     void clearPlayers();
