@@ -11,10 +11,7 @@ import com.pkkor.pandemic.enums.characters.Characters;
 import com.pkkor.pandemic.factory.PlayerCreator;
 import com.pkkor.pandemic.mappers.CharacterMapper;
 import com.pkkor.pandemic.mappers.PlayerMapper;
-import com.pkkor.pandemic.services.ConnectionsService;
-import com.pkkor.pandemic.services.PlayerDiscardPileService;
-import com.pkkor.pandemic.services.PlayerOrderService;
-import com.pkkor.pandemic.services.PlayerService;
+import com.pkkor.pandemic.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +28,7 @@ public class Game {
     private int blackCubes = 24;
     private int redCubes = 24;
     private int yellowCubes = 24;
+    private int researchStationsNumber = 6;
     private Map<Card, Integer> infectedCities = new HashMap<>();
     private int infectionRate;
     private PlayerService playerService;
@@ -40,11 +38,13 @@ public class Game {
     private ConnectionsService connectionsService;
     private PlayerOrderService playerOrderService;
     private PlayerDiscardPileService playerDiscardPileService;
+    private ResearchStationService researchStationService;
 
     @Autowired
     public Game(PlayerService playerService, PlayerMapper playerMapper, CharacterMapper characterMapper,
                 PlayerCreator playerCreator, ConnectionsService connectionsService,
-                PlayerOrderService playerOrderService, PlayerDiscardPileService playerDiscardPileService) {
+                PlayerOrderService playerOrderService, PlayerDiscardPileService playerDiscardPileService,
+                ResearchStationService researchStationService) {
         this.playerService = playerService;
         this.playerMapper = playerMapper;
         this.characterMapper = characterMapper;
@@ -52,6 +52,7 @@ public class Game {
         this.connectionsService = connectionsService;
         this.playerOrderService = playerOrderService;
         this.playerDiscardPileService = playerDiscardPileService;
+        this.researchStationService = researchStationService;
     }
 
     public void execute(CharacterChoiceDTO characterChoiceDTO) {
@@ -107,6 +108,7 @@ public class Game {
         }
 
         infectionDiscardPile = new ArrayList<>();
+        researchStationService.add(CityCards.ATLANTA);
 
     }
 

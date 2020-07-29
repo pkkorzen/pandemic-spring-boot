@@ -1,5 +1,6 @@
 package com.pkkor.pandemic.actions;
 
+import com.pkkor.pandemic.services.ResearchStationService;
 import com.pkkor.pandemic.utils.SpringApplicationContext;
 import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import com.pkkor.pandemic.services.ConnectionsService;
@@ -11,10 +12,8 @@ public abstract class AbstractMoveAction implements Action {
     @Override
     public final void execute(AbstractPlayer player, String... args) {
 
-        if (driveFerryMoveValid(player, args[0])) {
+        if (driveFerryMoveValid(player, args[0]) || shuttleFlightValid(player, args[0])) {
             player.setCity(args[0]);
-        } else if (shuttleFlightValid()) {
-
         /*} else if (specialMoveValid()) {
             specialMove();*/
             //TODO: still need to figure out how to decide on correct move, when two out of those three are true
@@ -58,8 +57,10 @@ public abstract class AbstractMoveAction implements Action {
         return validMove;
     }
 
-    final boolean shuttleFlightValid() {
-        return false;
+    final boolean shuttleFlightValid(AbstractPlayer player, String location) {
+        ResearchStationService researchStationService =
+                (ResearchStationService) SpringApplicationContext.getBean("researchStationServiceImpl");
+        return researchStationService.contains(player.getCity()) && researchStationService.contains(location);
     }
 
     protected abstract boolean specialMoveValid();
