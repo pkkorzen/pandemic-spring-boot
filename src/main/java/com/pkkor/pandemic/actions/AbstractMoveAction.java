@@ -1,19 +1,37 @@
 package com.pkkor.pandemic.actions;
 
+import com.pkkor.pandemic.enums.cards.Card;
+import com.pkkor.pandemic.mappers.CardMapper;
+import com.pkkor.pandemic.services.PlayerDiscardPileService;
+import com.pkkor.pandemic.services.PlayerToMoveService;
 import com.pkkor.pandemic.services.ResearchStationService;
 import com.pkkor.pandemic.utils.SpringApplicationContext;
 import com.pkkor.pandemic.entities.player.AbstractPlayer;
 import com.pkkor.pandemic.services.ConnectionsService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class AbstractMoveAction implements Action {
+
+    CardMapper cardMapper = (CardMapper) SpringApplicationContext.getBean("cardMapper");
+
     @Override
     public final void execute(AbstractPlayer player, String... args) {
 
-        if (driveFerryMoveValid(player, args[0]) || shuttleFlightValid(player, args[0])) {
-            player.setCity(args[0]);
+        PlayerToMoveService playerToMoveService = (PlayerToMoveService) SpringApplicationContext.getBean("playerToMoveServiceImpl");
+        AbstractPlayer playerToMove;
+
+        if (playerToMoveService.getPlayer() != null) {
+            playerToMove = playerToMoveService.getPlayer();
+        } else {
+            playerToMove = player;
+        }
+
+        if (driveFerryMoveValid(playerToMove, args[0]) || shuttleFlightValid(playerToMove, args[0])) {
+            playerToMove.setCity(args[0]);
         /*} else if (specialMoveValid()) {
             specialMove();*/
             //TODO: still need to figure out how to decide on correct move, when two out of those three are true
@@ -21,25 +39,25 @@ public abstract class AbstractMoveAction implements Action {
             // which one to choose
             /*} else if (specialMoveValid() && directFlightValid() && charterFlightValid()) {*/
 
-        } else if (specialMoveValid()) {
-            if (directFlightValid()) {
-                if (charterFlightValid()) {
+        } else if (specialMoveValid(player, playerToMove, args[0])) {
+            if (directFlightValid(player, args[0])) {
+                if (charterFlightValid(player, playerToMove)) {
                     //special, direct and charter logic
                 } else {
                     //special and direct logic
                 }
-            } else if (charterFlightValid()) {
+            } else if (charterFlightValid(player, playerToMove)) {
                 //special and charter logic
             } else {
-                specialMove();
+                specialMove(player, playerToMove, args[0]);
             }
 
-        } else if (directFlightValid() && charterFlightValid()) {
+        } else if (directFlightValid(player, args[0]) && charterFlightValid(player, playerToMove)) {
 
-        } else if (directFlightValid()) {
-
-        } else if (charterFlightValid()) {
-
+        } else if (directFlightValid(player, args[0])) {
+            executeFlight(player, playerToMove, args[0]);
+        } else if (charterFlightValid(player, playerToMove)) {
+            executeFlight(player, playerToMove, playerToMove.getCity());
         }
     }
 
@@ -63,16 +81,16 @@ public abstract class AbstractMoveAction implements Action {
         return researchStationService.contains(player.getCity()) && researchStationService.contains(location);
     }
 
-    protected abstract boolean specialMoveValid();
+    protected abstract boolean specialMoveValid(AbstractPlayer player, AbstractPlayer playerToMove, String location);
 
-    protected abstract void specialMove();
+    protected abstract void specialMove(AbstractPlayer player, AbstractPlayer playerToMove, String location);
 
-    final boolean directFlightValid() {
-        return false;
+    final boolean directFlightValid(AbstractPlayer player, String location) {
+        return isValidFlight(player, location);
     }
 
-    final boolean charterFlightValid() {
-        return false;
+    final boolean charterFlightValid(AbstractPlayer player, AbstractPlayer playerToMove) {
+        return isValidFlight(player, playerToMove.getCity());
     }
 
     private boolean isValidMove(List<String> activePlayerLocationConnections, String location) {
@@ -84,4 +102,24 @@ public abstract class AbstractMoveAction implements Action {
         return false;
     }
 
+    private boolean isValidFlight(AbstractPlayer player, String location) {
+        Card[] playerCards = player.getCards();
+        List<Card> matchingCards = Arrays.stream(playerCards)
+                .filter(card -> cardMapper.convertToNameString(card).equals(location))
+                .collect(Collectors.toList());
+        return !matchingCards.isEmpty();
+    }
+
+    private void executeFlight(AbstractPlayer player, AbstractPlayer playerToMove, String location) {
+        PlayerDiscardPileService playerDiscardPileService = (PlayerDiscardPileService) SpringApplicationContext.getBean("playerDiscardPileServiceImpl");
+        Card[] playerCards = player.getCards();
+        for (int i = 0; i < playerCards.length; i++) {
+            if (cardMapper.convertToNameString(playerCards[i]).equals(location)) {
+                playerToMove.setCity(location);
+                playerDiscardPileService.addToDiscardPile(playerCards[i]);
+                playerCards[i] = null;
+                break;
+            }
+        }
+    }
 }
