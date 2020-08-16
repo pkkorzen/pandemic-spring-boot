@@ -2,12 +2,9 @@ package com.pkkor.pandemic.actions;
 
 import com.pkkor.pandemic.enums.cards.Card;
 import com.pkkor.pandemic.mappers.CardMapper;
-import com.pkkor.pandemic.services.PlayerDiscardPileService;
-import com.pkkor.pandemic.services.PlayerToMoveService;
-import com.pkkor.pandemic.services.ResearchStationService;
+import com.pkkor.pandemic.services.*;
 import com.pkkor.pandemic.utils.SpringApplicationContext;
 import com.pkkor.pandemic.entities.player.AbstractPlayer;
-import com.pkkor.pandemic.services.ConnectionsService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +19,7 @@ public abstract class AbstractMoveAction implements Action {
     public final void execute(AbstractPlayer player, String... args) {
 
         PlayerToMoveService playerToMoveService = (PlayerToMoveService) SpringApplicationContext.getBean("playerToMoveServiceImpl");
+        MoveChoiceService moveChoiceService = (MoveChoiceService) SpringApplicationContext.getBean("moveChoiceServiceImpl");
         AbstractPlayer playerToMove;
 
         if (playerToMoveService.getPlayer() != null) {
@@ -42,18 +40,32 @@ public abstract class AbstractMoveAction implements Action {
         } else if (specialMoveValid(player, playerToMove, args[0])) {
             if (directFlightValid(player, args[0])) {
                 if (charterFlightValid(player, playerToMove)) {
-                    //special, direct and charter logic
+                    //special,direct and charter logic
+                    moveChoiceService.addChoice("Special"); //maybe enum instead of strings
+                    moveChoiceService.addChoice("Direct");
+                    moveChoiceService.addChoice("Charter");
+                    startThread(player, moveChoiceService, playerToMove, args[0]);
+
                 } else {
                     //special and direct logic
+                    moveChoiceService.addChoice("Special"); //maybe enum instead of strings
+                    moveChoiceService.addChoice("Direct");
+                    startThread(player, moveChoiceService, playerToMove, args[0]);
                 }
             } else if (charterFlightValid(player, playerToMove)) {
                 //special and charter logic
+                moveChoiceService.addChoice("Special"); //maybe enum instead of strings
+                moveChoiceService.addChoice("Charter");
+                startThread(player, moveChoiceService, playerToMove, args[0]);
             } else {
                 specialMove(player, playerToMove, args[0]);
             }
 
         } else if (directFlightValid(player, args[0]) && charterFlightValid(player, playerToMove)) {
-
+            //direct and charter logic
+            moveChoiceService.addChoice("Direct"); //maybe enum instead of strings
+            moveChoiceService.addChoice("Charter");
+            startThread(player, moveChoiceService, playerToMove, args[0]);
         } else if (directFlightValid(player, args[0])) {
             executeFlight(player, playerToMove, args[0]);
         } else if (charterFlightValid(player, playerToMove)) {
@@ -108,6 +120,36 @@ public abstract class AbstractMoveAction implements Action {
                 .filter(card -> cardMapper.convertToNameString(card).equals(location))
                 .collect(Collectors.toList());
         return !matchingCards.isEmpty();
+    }
+
+    private void startThread(AbstractPlayer player, MoveChoiceService moveChoiceService, AbstractPlayer playerToMove, String location) {
+        Thread thread = new Thread(() -> {
+            synchronized (moveChoiceService.getChoices()) {
+                while (moveChoiceService.getChoices().size() > 1) {
+                    try {
+                        moveChoiceService.getChoices().wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                String optionChosen = moveChoiceService.getChoices().get(0);
+                moveChoiceService.clear();
+                callMoveMethod(optionChosen, player, playerToMove, location);
+            }
+        });
+        thread.start();
+    }
+
+    private void callMoveMethod(String optionChosen, AbstractPlayer player, AbstractPlayer playerToMove, String location) {
+        switch (optionChosen) {
+            case "Special":
+                specialMove(player, playerToMove, location);
+            case "Direct":
+                executeFlight(player, playerToMove, location);
+            case "Charter":
+                executeFlight(player, playerToMove, playerToMove.getCity());
+        }
+
     }
 
     private void executeFlight(AbstractPlayer player, AbstractPlayer playerToMove, String location) {

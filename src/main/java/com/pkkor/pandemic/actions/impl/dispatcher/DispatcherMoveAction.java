@@ -21,6 +21,6 @@ public class DispatcherMoveAction extends AbstractMoveAction {
 
     @Override
     protected void specialMove(AbstractPlayer player, AbstractPlayer playerToMove, String location) {
-
+        playerToMove.setCity(location);
     }
 }
